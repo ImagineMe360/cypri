@@ -1,33 +1,33 @@
-name: Cypress UI Tests
+name: Cypress E2E Tests
 
 on:
   pull_request:
-    branches: [develop] # Run on PR into develop
+    branches: ['develop']
   push:
-    branches: [main] # Run when code hits main (Netlify deploy-ready)
+    branches: ['main']
 
 jobs:
-  cypress-run:
+  cypress-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Start Dev Server
+      - name: Start Vite dev server
         run: npm run dev &
         env:
           CI: true
 
-      - name: Wait for App
+      - name: Wait for Vite server to start
         uses: jakejarvis/wait-action@master
         with:
           url: 'http://localhost:5173'
@@ -37,3 +37,5 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
+          start: npm run dev
+          wait-on: 'http://localhost:5173'
